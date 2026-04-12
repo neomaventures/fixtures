@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Bump TypeScript from 5.x to 6.x
+- Replace individual strict flags with `strict: true` in tsconfig
+- Migrate tsconfig paths to use `${configDir}` instead of `baseUrl`
+- Add `esModuleInterop`, `noFallthroughCasesInSwitch`, and `types` to tsconfig
+- Add `rootDir` and empty `paths` override to lib tsconfig to prevent alias leakage in published builds
+- Add `*.tsbuildinfo` to `.gitignore`
+- Bump ESLint from 9.x to 10.x, `@eslint/js` to 10.x, `typescript-eslint` to 8.58, `globals` to 17.x
+- Bump `eslint-plugin-prettier` to ^5.5.5 for ESLint 10 peer compatibility
+- Add `eslint-plugin-import-x` with `import-x/order`, `import-x/no-cycle`, `import-x/no-duplicates` rules
+- Add `**/*.d.ts` to ESLint ignores
+- Fix import ordering across source files to match enforced conventions
+- Bump Jest from 29.x to 30.x, `@types/jest` to 30.x, `jest-extended` to 7.x
+- Bump `ts-jest` to ^29.4.9 (supports Jest 30 peer range)
+- Bump NestJS packages (`common`, `core`, `platform-express`, `testing`) to ^11.1.18
+- Bump `@neoma/managed-app` to ^0.5.0
+- Bump `@types/node` to ^25.5.2
+- Fix dependabot lib directory path from `{{PACKAGE_NAME}}` to `package-template`
+
 ## [0.3.3] - 2025-11-13
 
 ### Fixed

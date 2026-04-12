@@ -5,22 +5,20 @@
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
     "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": true,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "types": ["node", "jest"],
     "paths": {
-      "fixtures/*": ["fixtures/*"],
-      "@lib": ["libs/package-template/src"],
-      "@lib/*": ["libs/package-template/src/*"]
+      "fixtures/*": ["${configDir}/fixtures/*"],
+      "@lib": ["${configDir}/libs/package-template/src"],
+      "@lib/*": ["${configDir}/libs/package-template/src/*"]
     }
   }
 }

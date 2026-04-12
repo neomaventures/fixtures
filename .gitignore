@@ -1,6 +1,7 @@
 # compiled output
 dist
 *.tgz
+*.tsbuildinfo
 /node_modules
 /build
 

@@ -1,5 +1,5 @@
-import { Test } from "@nestjs/testing"
 import { ExampleModule } from "@lib"
+import { Test } from "@nestjs/testing"
 
 describe("ExampleModule", () => {
   it("should compile the module", async () => {
