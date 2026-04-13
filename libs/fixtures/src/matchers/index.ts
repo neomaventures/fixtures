@@ -1,25 +1,11 @@
 import { EXPECTED_COLOR, RECEIVED_COLOR } from "jest-matcher-utils"
-import { isEqual } from "lodash"
+import isEqual from "lodash.isequal"
 
-const matchError = (
+const checkErrorInstance = (
   subject: unknown,
   ErrorClass: new (...args: any[]) => Error,
   expectedProps?: Record<string, unknown>,
 ): jest.CustomMatcherResult => {
-  // If it is a function, call it and catch
-  if (subject instanceof Function) {
-    try {
-      subject()
-      return {
-        pass: false,
-        message: () =>
-          `Expected function to throw ${EXPECTED_COLOR(ErrorClass.name)}, but it did not throw`,
-      }
-    } catch (e) {
-      subject = e
-    }
-  }
-
   // Check type
   if (!(subject instanceof ErrorClass)) {
     return {
@@ -56,7 +42,48 @@ const matchError = (
   }
 }
 
+const toThrowMatching = (
+  subject: unknown,
+  ErrorClass: new (...args: any[]) => Error,
+  expectedProps?: Record<string, unknown>,
+): jest.CustomMatcherResult => {
+  if (!(subject instanceof Function)) {
+    return {
+      pass: false,
+      message: () =>
+        `toThrowMatching requires a function, but received ${RECEIVED_COLOR(typeof subject)}. Use toMatchError to check an already-caught error.`,
+    }
+  }
+
+  try {
+    subject()
+    return {
+      pass: false,
+      message: () =>
+        `Expected function to throw ${EXPECTED_COLOR(ErrorClass.name)}, but it did not throw`,
+    }
+  } catch (e) {
+    return checkErrorInstance(e, ErrorClass, expectedProps)
+  }
+}
+
+const toMatchError = (
+  subject: unknown,
+  ErrorClass: new (...args: any[]) => Error,
+  expectedProps?: Record<string, unknown>,
+): jest.CustomMatcherResult => {
+  if (subject instanceof Function) {
+    return {
+      pass: false,
+      message: () =>
+        `toMatchError requires an error instance, but received a function. Use toThrowMatching to assert on a throwing function.`,
+    }
+  }
+
+  return checkErrorInstance(subject, ErrorClass, expectedProps)
+}
+
 expect.extend({
-  toThrowMatching: matchError,
-  toMatchError: matchError,
+  toThrowMatching,
+  toMatchError,
 })

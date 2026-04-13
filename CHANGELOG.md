@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `setupFilesAfterSetup` typo in README — correct name is `setupFilesAfterEnv`
+- Fix `caseInsensitiveSearch` dropping falsy header values (e.g. empty strings) due to `||` operator
+- Fix `request()` header normalization — `arguments[0]` spread no longer re-adds un-normalized header keys
+- Replace full `lodash` dependency with `lodash.isequal` to reduce bundle size
+
+### Changed
+
+- `toThrowMatching` now rejects non-function subjects with a descriptive error message
+- `toMatchError` now rejects function subjects with a descriptive error message
+- `MockLoggerService` now includes `verbose` and `setLogLevels` methods
+
 ### Added
 
 - `express.request()` — mock Express Request with randomized defaults and case-insensitive header access

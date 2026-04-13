@@ -44,6 +44,12 @@ describe("toThrowMatching", () => {
       }).toThrowMatching(TestError, { code: "EXPECTED" })
     }).toThrow(/code/)
   })
+
+  it("should reject non-function subjects with a clear error", () => {
+    expect(() => {
+      expect(new TestError("ERR")).toThrowMatching(TestError)
+    }).toThrow(/toThrowMatching requires a function/)
+  })
 })
 
 describe("toMatchError", () => {
@@ -61,5 +67,13 @@ describe("toMatchError", () => {
     expect(() => {
       expect(new Error("wrong")).toMatchError(TestError)
     }).toThrow(/Expected.*TestError.*got.*Error/)
+  })
+
+  it("should reject function subjects with a clear error", () => {
+    expect(() => {
+      expect(() => {
+        throw new TestError("ERR")
+      }).toMatchError(TestError)
+    }).toThrow(/toMatchError requires an error instance.*received a function/)
   })
 })

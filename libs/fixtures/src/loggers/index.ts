@@ -8,7 +8,9 @@ import { type LoggerService } from "@nestjs/common"
  * @property fatal A jest function that mocks the fatal method from LoggerService.
  * @property log A jest function that mocks the log method from LoggerService.
  * @property trace A jest function that mocks the trace method from LoggerService.
+ * @property verbose A jest function that mocks the optional verbose method from LoggerService.
  * @property warn A jest function that mocks the warn method from LoggerService.
+ * @property setLogLevels A jest function that mocks the optional setLogLevels method from LoggerService.
  */
 export class MockLoggerService implements LoggerService {
   public debug = jest.fn()
@@ -16,5 +18,7 @@ export class MockLoggerService implements LoggerService {
   public fatal = jest.fn()
   public log = jest.fn()
   public trace = jest.fn()
+  public verbose = jest.fn()
   public warn = jest.fn()
+  public setLogLevels = jest.fn()
 }

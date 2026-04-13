@@ -11,8 +11,7 @@ const caseInsensitiveSearch = (
   obj: OutgoingHttpHeaders,
   key: string,
 ): OutgoingHttpHeader | undefined => {
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- falsy check is intentional: empty string headers should not be returned
-  return obj[key] || obj[key.toLowerCase()]
+  return obj[key.toLowerCase()]
 }
 
 const convertHeadersToLowerCase = <T extends Record<string, unknown>>(
@@ -196,16 +195,10 @@ export const express: ExpressFixtures = {
       signedCookies: {},
     },
   ): MockRequest {
-    const normalizedHeaders = convertHeadersToLowerCase(headers)
-    return {
-      get(name: string): any {
-        return normalizedHeaders[name.toLowerCase()]
-      },
-      header(name: string): any {
-        return normalizedHeaders[name.toLowerCase()]
-      },
+    // Build the base object with the arguments spread, then normalize headers
+    // afterward so that the spread cannot re-add un-normalized keys.
+    const base = {
       body,
-      headers: normalizedHeaders,
       method,
       url,
       res,
@@ -214,6 +207,17 @@ export const express: ExpressFixtures = {
       signedCookies,
       // eslint-disable-next-line prefer-rest-params
       ...(arguments[0] as Partial<MockRequest>),
+    }
+    const normalizedHeaders = convertHeadersToLowerCase(base.headers ?? headers)
+    return {
+      get(name: string): any {
+        return normalizedHeaders[name.toLowerCase()]
+      },
+      header(name: string): any {
+        return normalizedHeaders[name.toLowerCase()]
+      },
+      ...base,
+      headers: normalizedHeaders,
       // Must include the connection so that the Bunyan req serializer treats it as a real request.
       connection: {} as Socket,
     }

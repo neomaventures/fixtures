@@ -8,6 +8,6 @@ export { executionContext } from "./nestjs"
 // Logger mock — implements LoggerService with jest.fn() methods
 export { MockLoggerService } from "./loggers"
 
-// Custom matchers are loaded separately via Jest setupFilesAfterSetup:
+// Custom matchers are loaded separately via Jest setupFilesAfterEnv:
 //   import '@neoma/fixtures/matchers'
 // They are NOT re-exported here — they self-register via expect.extend().

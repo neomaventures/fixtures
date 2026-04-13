@@ -20,6 +20,7 @@
   "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "_comment": "This package uses an exports map instead of main+types only because the ./matchers sub-path must be loadable independently via Jest setupFilesAfterEnv without importing the main entry point.",
   "exports": {
     ".": {
       "require": "./dist/index.js",
@@ -48,9 +49,9 @@
   },
   "dependencies": {
     "@faker-js/faker": "^9.0.0",
-    "lodash": "^4.17.21"
+    "lodash.isequal": "^4.5.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.0"
+    "@types/lodash.isequal": "^4.5.0"
   }
 }

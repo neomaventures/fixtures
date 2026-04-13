@@ -102,11 +102,11 @@ expect(logger.error).toHaveBeenCalledWith('something failed')
 
 ### Custom Jest matchers
 
-Add to your Jest config's `setupFilesAfterSetup`:
+Add to your Jest config's `setupFilesAfterEnv`:
 
 ```json
 {
-  "setupFilesAfterSetup": ["@neoma/fixtures/matchers"]
+  "setupFilesAfterEnv": ["@neoma/fixtures/matchers"]
 }
 ```
 
