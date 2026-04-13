@@ -1,239 +1,133 @@
-# Neoma Package Template
+# @neoma/fixtures
 
-Template for creating new Neoma packages with consistent structure, configuration, and testing setup.
+Test fixtures for @neoma/* NestJS packages. Provides mock Express and NestJS objects, custom Jest matchers, and a mock logger for unit-testing NestJS building blocks (guards, interceptors, filters, pipes, middleware).
 
-## Creating a New Package
-
-### 1. Copy this template
+## Installation
 
 ```bash
-cd /path/to/wulfstack/packages
-cp -r neoma-fixtures neoma-<your-package-name>
-cd neoma-<your-package-name>
+npm install --save-dev @neoma/fixtures
 ```
 
-### 2. Replace placeholders
+### Peer dependencies
 
-Search and replace throughout the project:
-- `fixtures` → Your package name (e.g., "garmr", "validation")
-- `Test fixtures for @neoma/* NestJS packages` → Short description
-- `https://github.com/shipdventures/neoma-fixtures` → GitHub repository URL (e.g., "https://github.com/shipdventures/neoma-garmr")
+- `@nestjs/common` 11.x
+- `jest` >= 29.0.0
+- `@types/jest` >= 29.0.0
 
-**Quick find/replace:**
-```bash
-# macOS/Linux
-find . -type f -name "*.json" -o -name "*.md" -o -name "*.ts" | xargs sed -i '' 's/fixtures/your-package-name/g'
-find . -type f -name "*.json" -o -name "*.md" -o -name "*.ts" | xargs sed -i '' 's/Test fixtures for @neoma/* NestJS packages/Your description/g'
-find . -type f -name "*.json" -o -name "*.md" -o -name "*.ts" | xargs sed -i '' 's|https://github.com/shipdventures/neoma-fixtures|https://github.com/your-org/your-repo|g'
-```
+## Usage
 
-### 3. Rename directories
+### Express mocks
 
-```bash
-mv libs/fixtures libs/your-package-name
-```
-
-### 4. Install dependencies
-
-```bash
-npm install
-```
-
-### 5. Start building!
-
-```bash
-npm test        # Unit tests (TDD)
-npm run test:e2e # E2E tests
-npm run build   # Build library
-npm run lint    # Lint code
-```
-
-## Package Structure
-
-```
-neoma-<package-name>/
-├── libs/
-│   └── <package-name>/           # The npm package
-│       ├── src/
-│       │   ├── modules/          # NestJS modules
-│       │   ├── decorators/       # Custom decorators
-│       │   ├── middlewares/      # Middleware
-│       │   ├── guards/           # Guards
-│       │   ├── services/         # Services
-│       │   ├── interfaces/       # TypeScript interfaces
-│       │   ├── constants/        # Constants
-│       │   └── index.ts          # Public API exports
-│       ├── package.json          # Published package.json
-│       └── tsconfig.lib.json     # Library TypeScript config
-├── src/                          # Example/test application
-│   ├── app.module.ts
-│   └── ...
-├── specs/                        # E2E tests
-│   ├── jest-e2e.json
-│   └── *.e2e-spec.ts
-├── fixtures/                     # Test fixtures and utilities
-│   ├── app/                      # Test app lifecycle management
-│   ├── database/                 # In-memory database setup
-│   ├── models/                   # Model factory patterns
-│   ├── matchers/                 # Custom Jest matchers
-│   └── e2e-setup.js              # E2E build hook
-├── package.json                  # Development package.json
-├── tsconfig.json                 # Root TypeScript config
-├── eslint.config.mjs             # ESLint config
-├── .prettierrc                   # Prettier config
-├── .gitignore
-├── .nvmrc
-├── LICENSE
-└── README.md                     # Package documentation
-```
-
-## Testing Strategy
-
-### E2E Tests (`specs/`)
-- One file per major feature or configuration
-- Tests full install experience and integration
-- Uses real NestJS app, real database
-- Proves README instructions work
-
-**Example**: The template includes `specs/app.e2e-spec.ts` demonstrating how to test endpoints using `managedAppInstance()` and supertest.
-
-### Unit Tests (`libs/<package>/src/**/*.spec.ts`)
-- TDD: Drive implementation
-- Test individual classes/functions
-- Fast feedback loop
-- Test edge cases and error handling
-
-**Example**: The template includes `libs/fixtures/src/modules/example.module.spec.ts` showing how to test NestJS modules.
-
-### Complete Testing Flow
-
-1. **Write library code** in `libs/fixtures/src/`
-2. **Write unit tests** alongside your code (`*.spec.ts`)
-3. **Export from** `libs/fixtures/src/index.ts`
-4. **Import in** `src/app.module.ts` for E2E testing
-5. **Write E2E tests** in `specs/` to validate integration
-
-The template includes working examples of all these steps with `ExampleModule`.
-
-**Don't test the same config twice** - E2E covers integration, unit tests cover logic.
-
-## Testing Infrastructure
-
-The template includes ready-to-use testing utilities in the `fixtures/` directory:
-
-### App Lifecycle (`fixtures/app`)
 ```typescript
-import { managedAppInstance } from "fixtures/app"
+import { express } from '@neoma/fixtures'
+import type { MockRequest, MockResponse } from '@neoma/fixtures'
 
-describe("My E2E Test", () => {
-  it("should work", async () => {
-    const app = managedAppInstance()
-    // App is automatically initialized before each test
-    // and cleaned up after each test
-  })
+// Create a request with randomized defaults
+const req = express.request()
+
+// Override specific properties
+const customReq = express.request({
+  method: 'POST',
+  headers: { authorization: 'Bearer token' },
+  body: { name: 'test' },
 })
+
+// Case-insensitive header access
+req.get('Authorization')   // => 'Bearer token'
+req.get('authorization')   // => 'Bearer token'
+req.header('Authorization') // => 'Bearer token'
+
+// Create a response with locals and headers
+const res = express.response({
+  locals: { user: { id: 'abc' } },
+  headers: { 'Content-Type': 'text/html' },
+})
+
+// status() sets statusCode AND returns this for chaining
+res.status(404).json({ error: 'Not found' })
+expect(res.statusCode).toBe(404)
+expect(res.json).toHaveBeenCalledWith({ error: 'Not found' })
+
+// Mutable headers
+res.setHeader('X-Custom', 'value')
+res.getHeader('x-custom') // => 'value'
+
+// Create a signed cookie (HMAC-SHA256, cookie-parser format)
+const cookie = express.cookie('user123', 'my-secret')
+const jsonCookie = express.cookie({ userId: 'abc' }, 'my-secret')
 ```
 
-### Database Setup (`fixtures/database`)
+### NestJS ExecutionContext
+
 ```typescript
-import { managedDatasourceInstance } from "fixtures/database"
+import { executionContext, express } from '@neoma/fixtures'
 
-describe("My Database Test", () => {
-  it("should query database", async () => {
-    const datasource = managedDatasourceInstance()
-    // Fresh in-memory SQLite database for each test
-    // Automatically destroyed after each test
-  })
+// Minimal context (just switchToHttp)
+const ctx = executionContext(req, res)
+ctx.switchToHttp().getRequest()  // => req
+ctx.switchToHttp().getResponse() // => res
+
+// With bare handler function (for isolated guard testing)
+const handler = (): void => {}
+Reflect.defineMetadata('roles', ['admin'], handler)
+const ctx = executionContext(req, res, handler)
+ctx.getHandler() // => handler
+ctx.getClass()   // => Object
+
+// With custom class
+const ctx = executionContext(req, res, handler, MyController)
+ctx.getClass() // => MyController
+
+// With typed route object (for integration-style testing)
+const ctx = executionContext(req, res, {
+  controller: UserController,
+  method: 'findAll',
 })
+ctx.getHandler() // => UserController.prototype.findAll
+ctx.getClass()   // => UserController
 ```
 
-### Model Factories (`fixtures/models`)
-See `fixtures/models/README.md` for the pattern and examples.
+### MockLoggerService
 
-### Custom Matchers (`fixtures/matchers`)
-- `toThrowEquals(error)` - Assert errors match exactly
-- `toEqualError(error)` - Assert errors are equal
+```typescript
+import { MockLoggerService } from '@neoma/fixtures'
 
-### E2E Build Hook (`fixtures/e2e-setup.js`)
-Automatically builds the library before E2E tests run.
+const logger = new MockLoggerService()
+// Use anywhere NestJS expects a LoggerService
+// All methods (log, error, warn, debug, verbose, trace, fatal, setLogLevels) are jest.fn()
 
-## Scripts
-
-- `npm run build` - Build the library
-- `npm run lint` - Lint all code
-- `npm test` - Run unit tests in watch mode
-- `npm run test:e2e` - Run E2E tests in watch mode
-
-## Configuration Highlights
-
-### TypeScript
-- Target: ES2022
-- Strict null checks enabled
-- Decorators enabled
-- No semicolons (enforced)
-
-### ESLint
-- Explicit return types required
-- Explicit member accessibility required
-- No floating promises
-- Prettier integration
-
-### Jest
-- ts-jest for TypeScript
-- jest-extended for additional matchers
-- In-memory SQLite for tests
-- Module path mapping for clean imports
-
-## Example README Structure
-
-When you publish, your README should include:
-
-1. **Motivation** - Why this package exists
-2. **Problem/Solution** - Before/after code examples
-3. **Installation** - Step-by-step setup
-4. **Basic Usage** - Simple examples
-5. **Advanced Usage** - Custom configurations
-6. **API Reference** - All public APIs
-7. **Links** - npm, GitHub, docs
-
-See `@neoma/route-model-binding` README for a good example.
-
-## Publishing Checklist
-
-Before publishing to npm:
-
-- [ ] All tests passing
-- [ ] README is complete
-- [ ] LICENSE file included
-- [ ] Version bumped in both package.json files
-- [ ] Built with `npm run build`
-- [ ] Verify exports in `libs/<package>/src/index.ts`
-- [ ] Test installation in separate project
-- [ ] Verify peer dependencies are correct
-
-```bash
-cd libs/<your-package-name>
-npm publish --access public
+logger.error('something failed')
+expect(logger.error).toHaveBeenCalledWith('something failed')
 ```
 
-## Neoma Package Standards
+### Custom Jest matchers
 
-All Neoma packages should:
-- ✅ Be Laravel-inspired but NestJS-native
-- ✅ Have minimal boilerplate
-- ✅ Include comprehensive tests
-- ✅ Have excellent documentation
-- ✅ Use TypeScript strictly
-- ✅ Follow consistent code style
-- ✅ Be production-ready
+Add to your Jest config's `setupFilesAfterEnv`:
 
-## Template Improvements (TODO)
+```json
+{
+  "setupFilesAfterEnv": ["@neoma/fixtures/matchers"]
+}
+```
 
-Future enhancements to this template:
+Then use in tests:
 
-- [ ] **GitHub Issue & PR Templates** - Add `.github/ISSUE_TEMPLATE/` for bug reports and feature requests, plus `.github/pull_request_template.md`
-- [ ] **CONTRIBUTING.md** - Document contribution guidelines, coding standards, and development workflow
-- [ ] **CHANGELOG.md Template** - Add template following Keep a Changelog format
-- [ ] **README Badges** - Add placeholders for CI status, npm version, and license badges
-- [ ] **VSCode Extensions** - Add `.vscode/extensions.json` with recommended extensions for NestJS development
-- [ ] **CODE_OF_CONDUCT.md** - Add community standards if accepting external contributions
+```typescript
+// Check that a function throws a specific error class
+expect(() => service.register(email)).toThrowMatching(
+  EmailAlreadyExistsException,
+)
+
+// Check class + properties
+expect(() => service.register(email)).toThrowMatching(
+  EmailAlreadyExistsException,
+  { email: 'test@example.com' },
+)
+
+// Check an already-caught error
+expect(caughtError).toMatchError(NotFoundException, { message: 'Not found' })
+```
+
+## License
+
+MIT
