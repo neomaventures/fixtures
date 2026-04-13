@@ -1,5 +1,4 @@
 import "./index"
-import type {} from "./index.d"
 
 class TestError extends Error {
   public constructor(
