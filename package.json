@@ -83,8 +83,7 @@
       "<rootDir>/libs/"
     ],
     "setupFilesAfterEnv": [
-      "jest-extended/all",
-      "<rootDir>/fixtures/matchers/index.js"
+      "jest-extended/all"
     ],
     "moduleNameMapper": {
       "fixtures/(.*)$": "<rootDir>/fixtures/$1",
