@@ -1,6 +1,9 @@
 import crypto from "crypto"
-import { type IncomingHttpHeaders, type OutgoingHttpHeader } from "http"
-import { type OutgoingHttpHeaders } from "http2"
+import {
+  type IncomingHttpHeaders,
+  type OutgoingHttpHeader,
+  type OutgoingHttpHeaders,
+} from "http"
 import { type Socket } from "net"
 
 import { faker } from "@faker-js/faker"
