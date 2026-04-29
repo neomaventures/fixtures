@@ -57,6 +57,14 @@
     "./teardown/mockserver": {
       "require": "./dist/teardown/mockserver.js",
       "types": "./dist/teardown/mockserver.d.ts"
+    },
+    "./mockserver": {
+      "require": "./dist/mockserver/index.js",
+      "types": "./dist/mockserver/index.d.ts"
+    },
+    "./mailpit": {
+      "require": "./dist/mailpit/index.js",
+      "types": "./dist/mailpit/index.d.ts"
     }
   },
   "scripts": {
