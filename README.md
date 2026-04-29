@@ -128,6 +128,84 @@ expect(() => service.register(email)).toThrowMatching(
 expect(caughtError).toMatchError(NotFoundException, { message: 'Not found' })
 ```
 
+### MockServer client
+
+Interact with a running MockServer instance. Available via `@neoma/fixtures/mockserver`.
+
+```typescript
+import {
+  createExpectation,
+  resetMockServer,
+  verifyExpectationMatched,
+  MockserverBodyTypes,
+  MockserverMatchTypes,
+} from '@neoma/fixtures/mockserver'
+
+const baseUrl = process.env.MOCKSERVER_URL! // e.g. "http://localhost:1080/mockserver"
+
+// Reset all expectations
+await resetMockServer(baseUrl)
+
+// Register an expectation
+await createExpectation({
+  httpRequest: { path: '/api/users', method: 'GET' },
+  httpResponse: { statusCode: 200, body: JSON.stringify([{ id: '1' }]) },
+  times: { unlimited: true },
+}, baseUrl)
+
+// Register an expectation with body matching
+await createExpectation({
+  httpRequest: {
+    path: '/api/users',
+    method: 'POST',
+    body: {
+      type: MockserverBodyTypes.JSON,
+      json: { name: 'Alice' },
+      matchType: MockserverMatchTypes.OnlyMatchingFields,
+    },
+  },
+  httpResponse: { statusCode: 201, body: JSON.stringify({ id: '2' }) },
+  times: { remainingTimes: 1 },
+}, baseUrl)
+
+// Verify a request was made
+const matched = await verifyExpectationMatched(
+  { path: '/api/users', method: 'GET' },
+  baseUrl,
+)
+
+// Verify a request was made exactly 3 times
+const matchedThrice = await verifyExpectationMatched(
+  { path: '/api/users', method: 'GET' },
+  baseUrl,
+  3,
+)
+```
+
+### Mailpit client
+
+Interact with a running Mailpit instance to inspect captured emails. Available via `@neoma/fixtures/mailpit`.
+
+```typescript
+import { createMailpitClient } from '@neoma/fixtures/mailpit'
+
+const client = createMailpitClient(process.env.MAILPIT_API!)
+
+// Clear all messages (useful in beforeEach)
+await client.clear()
+
+// List all captured messages
+const { messages } = await client.messages()
+
+// Fetch a single message by ID
+const full = await client.message(messages[0].ID)
+console.log(full.Subject, full.HTML)
+
+// Find a message by recipient (case-insensitive)
+const msg = await client.findByRecipient('user@example.com')
+console.log(msg.Subject, msg.HTML)
+```
+
 ### Docker container utilities
 
 Start and stop Docker containers for test infrastructure. Available via `@neoma/fixtures/docker`.
