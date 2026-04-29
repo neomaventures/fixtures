@@ -146,11 +146,12 @@ Add to your Jest config for automatic container lifecycle:
 For multiple services, write a custom setup file using the programmatic API:
 
 ```typescript
-import { startMockServer, startMailpit } from '@neoma/fixtures/docker'
+import { startMockServer, startMailpit, startMinIO } from '@neoma/fixtures/docker'
 
 export default async (): Promise<void> => {
   await startMockServer()
   await startMailpit()
+  await startMinIO()
 }
 ```
 
@@ -202,6 +203,37 @@ await stopMailpit()
 await stopMailpit({ prefix: 'myapp-e2e' })
 ```
 
+**MinIO (S3-compatible object storage)**
+
+```typescript
+import { startMinIO, stopMinIO } from '@neoma/fixtures/docker'
+
+// Start with defaults (API 9000, Console 9001, bucket "test-bucket", prefix "neoma-test")
+const config = await startMinIO()
+// config.container === "neoma-test-minio"
+// config.apiPort === 9000
+// config.consolePort === 9001
+// config.bucket === "test-bucket"
+// process.env.STORAGE_ENDPOINT === "http://localhost:9000"
+// process.env.STORAGE_REGION === "us-east-1"
+// process.env.STORAGE_ACCESS_KEY === "minioadmin"
+// process.env.STORAGE_SECRET_KEY === "minioadmin"
+// process.env.STORAGE_BUCKET === "test-bucket"
+// process.env.STORAGE_FORCE_PATH_STYLE === "true"
+
+// Start with explicit options
+const config = await startMinIO({
+  prefix: 'myapp-e2e',
+  apiPort: 9100,
+  consolePort: 9101,
+  bucket: 'my-bucket',
+})
+
+// Stop
+await stopMinIO()
+await stopMinIO({ prefix: 'myapp-e2e' })
+```
+
 #### Port configuration
 
 Ports can be set via options or environment variables. Precedence: option > env var > default.
@@ -210,6 +242,8 @@ Ports can be set via options or environment variables. Precedence: option > env 
 |---------|----------------|---------|---------------------|
 | Mailpit | `MAILPIT_SMTP_PORT` | `1025` | `SMTP_HOST`, `SMTP_PORT` |
 | Mailpit | `MAILPIT_API_PORT` | `8025` | `MAILPIT_API` |
+| MinIO | `MINIO_PORT` | `9000` | `STORAGE_ENDPOINT`, `STORAGE_REGION`, `STORAGE_ACCESS_KEY`, `STORAGE_SECRET_KEY`, `STORAGE_BUCKET`, `STORAGE_FORCE_PATH_STYLE` |
+| MinIO | `MINIO_CONSOLE_PORT` | `9001` | |
 | MockServer | `MOCKSERVER_PORT` | `1080` | `MOCKSERVER_URL` |
 
 Use Node's built-in `--env-file` flag to load env vars from a file:

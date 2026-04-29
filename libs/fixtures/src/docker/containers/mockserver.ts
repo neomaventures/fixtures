@@ -62,7 +62,16 @@ export async function startContainer(
 
   execFileSync(
     "docker",
-    ["run", "-d", "--name", container, "-p", `${port}:1080`, MOCKSERVER_IMAGE],
+    [
+      "run",
+      "-d",
+      "--name",
+      container,
+      "-p",
+      `${port}:1080`,
+      "--",
+      MOCKSERVER_IMAGE,
+    ],
     { stdio: "ignore" },
   )
 
