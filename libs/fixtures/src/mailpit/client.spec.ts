@@ -40,6 +40,9 @@ describe("MailpitClient", () => {
 
   afterAll(async () => {
     await stopMailpit({ prefix })
+    delete process.env.SMTP_HOST
+    delete process.env.SMTP_PORT
+    delete process.env.MAILPIT_API
   })
 
   beforeEach(async () => {

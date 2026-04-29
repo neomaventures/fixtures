@@ -1,3 +1,5 @@
+import { type MailpitMessage, type MailpitMessageList } from "./types"
+
 /**
  * HTTP client for interacting with the Mailpit REST API.
  *
@@ -60,7 +62,7 @@ export class MailpitClient {
    * const { messages } = await client.messages()
    * ```
    */
-  public async messages(): Promise<any> {
+  public async messages(): Promise<MailpitMessageList> {
     const res = await fetch(`${this.baseUrl}/messages`)
     return this.parseResponse(res, "/messages")
   }
@@ -77,7 +79,7 @@ export class MailpitClient {
    * console.log(full.Subject, full.HTML)
    * ```
    */
-  public async message(id: string): Promise<any> {
+  public async message(id: string): Promise<MailpitMessage> {
     const res = await fetch(`${this.baseUrl}/message/${id}`)
     return this.parseResponse(res, `/message/${id}`)
   }
@@ -97,15 +99,15 @@ export class MailpitClient {
    * console.log(msg.Subject, msg.HTML)
    * ```
    */
-  public async findByRecipient(email: string): Promise<any> {
+  public async findByRecipient(email: string): Promise<MailpitMessage> {
     const { messages } = await this.messages()
-    const match = messages.find((m: any) =>
-      m.To.some((to: any) => to.Address.toLowerCase() === email.toLowerCase()),
+    const match = messages.find((m) =>
+      m.To.some((to) => to.Address.toLowerCase() === email.toLowerCase()),
     )
     if (!match) {
       throw new Error(`No email found for recipient: ${email}`)
     }
-    return this.message(match.ID as string)
+    return this.message(match.ID)
   }
 
   /**

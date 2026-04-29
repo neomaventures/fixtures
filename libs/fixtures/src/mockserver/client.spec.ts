@@ -22,6 +22,7 @@ describe("MockServerClient", () => {
 
   afterAll(async () => {
     await stopMockServer({ prefix })
+    delete process.env.MOCKSERVER_URL
   })
 
   beforeEach(async () => {

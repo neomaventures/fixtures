@@ -114,6 +114,16 @@ export class MockServerClient {
       }),
     })
 
-    return response.ok
+    if (response.ok) {
+      return true
+    }
+
+    if (response.status === 406) {
+      return false
+    }
+
+    throw new Error(
+      `Error verifying expectation on ${this.baseUrl}: ${response.status} ${await response.text()}`,
+    )
   }
 }
