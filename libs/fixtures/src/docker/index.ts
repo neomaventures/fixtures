@@ -1,5 +1,10 @@
 // Container start/stop functions
 export {
+  startContainer as startMailpit,
+  stopContainer as stopMailpit,
+} from "./containers/mailpit"
+export type { MailpitConfig, MailpitOptions } from "./containers/mailpit"
+export {
   startContainer as startMockServer,
   stopContainer as stopMockServer,
 } from "./containers/mockserver"
@@ -9,7 +14,7 @@ export type {
 } from "./containers/mockserver"
 
 // Shared utilities
-export { waitForHttp } from "./health"
+export { waitForHttp, waitForTcp } from "./health"
 
 // Shared types
 export type { BaseOptions, HealthCheckOptions } from "./types"

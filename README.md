@@ -173,12 +173,43 @@ await stopMockServer()
 await stopMockServer({ prefix: 'myapp-e2e' })
 ```
 
+**Mailpit (SMTP + API)**
+
+```typescript
+import { startMailpit, stopMailpit } from '@neoma/fixtures/docker'
+
+// Start with defaults (SMTP 1025, API 8025, prefix "neoma-test")
+const config = await startMailpit()
+// config.container === "neoma-test-mailpit"
+// config.smtpPort === 1025
+// config.apiPort === 8025
+// process.env.SMTP_HOST === "localhost"
+// process.env.SMTP_PORT === "1025"
+// process.env.MAILPIT_API === "http://localhost:8025/api/v1"
+
+// Start with explicit options
+const config = await startMailpit({
+  prefix: 'myapp-e2e',
+  smtpPort: 2025,
+  apiPort: 9025,
+})
+
+// With SMTP authentication (htpasswd file)
+const config = await startMailpit({ htpasswd: '/path/to/auth.htpasswd' })
+
+// Stop
+await stopMailpit()
+await stopMailpit({ prefix: 'myapp-e2e' })
+```
+
 #### Port configuration
 
 Ports can be set via options or environment variables. Precedence: option > env var > default.
 
 | Service | Env var (input) | Default | Env var set (output) |
 |---------|----------------|---------|---------------------|
+| Mailpit | `MAILPIT_SMTP_PORT` | `1025` | `SMTP_HOST`, `SMTP_PORT` |
+| Mailpit | `MAILPIT_API_PORT` | `8025` | `MAILPIT_API` |
 | MockServer | `MOCKSERVER_PORT` | `1080` | `MOCKSERVER_URL` |
 
 Use Node's built-in `--env-file` flag to load env vars from a file:
